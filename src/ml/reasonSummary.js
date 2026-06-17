@@ -8,9 +8,9 @@ export function buildReasonSummary(data) {
   }
 
   if (data.average_obligation_to_income_ratio > 50) {
-    reasons.push("rasio kewajiban terhadap pendapatan tinggi");
+    reasons.push("rasio cicilan terhadap pendapatan tinggi");
   } else if (data.average_obligation_to_income_ratio <= 30) {
-    reasons.push("rasio kewajiban terhadap pendapatan rendah");
+    reasons.push("rasio cicilan terhadap pendapatan rendah");
   }
 
   if (data.bounce_count > 0) {

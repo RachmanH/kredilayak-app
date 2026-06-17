@@ -1,3 +1,25 @@
+export function validateIdentity(data) {
+  const errors = {};
+
+  if (!data.applicant_name || data.applicant_name.trim() === "") {
+    errors.applicant_name = "Nama wajib diisi";
+  }
+
+  const age = Number(data.applicant_age);
+  if (isNaN(age) || !Number.isInteger(age) || age < 17 || age > 100) {
+    errors.applicant_age = "Angka bulat, 17-100 tahun";
+  }
+
+  if (!data.applicant_gender || data.applicant_gender.trim() === "") {
+    errors.applicant_gender = "Wajib dipilih";
+  }
+
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors,
+  };
+}
+
 export function validateApplicant(data) {
   const errors = {};
 

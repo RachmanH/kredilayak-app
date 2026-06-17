@@ -1,14 +1,15 @@
 import { RISK_LABEL_ID } from "../ml/mappings";
+import { exportToPdf } from "../utils/exportPdf";
 
 function pct(val) {
   return (val * 100).toFixed(1) + "%";
 }
 
 function scoreColor(score) {
-  if (score >= 0.8) return "status--excellent";
-  if (score >= 0.6) return "status--good";
-  if (score >= 0.4) return "status--moderate";
-  if (score >= 0.2) return "status--risky";
+  if (score >= 0.5054) return "status--excellent";
+  if (score >= 0.4602) return "status--good";
+  if (score >= 0.4176) return "status--moderate";
+  if (score >= 0.3319) return "status--risky";
   return "status--bad";
 }
 
@@ -18,12 +19,33 @@ function riskColor(risk) {
   return "risk--high";
 }
 
-export default function ResultPanel({ result, reasonSummary }) {
+export default function ResultPanel({ result, reasonSummary, identity, formData }) {
   if (!result) return null;
+
+  function handleExport() {
+    exportToPdf(identity, formData, result, reasonSummary);
+  }
 
   return (
     <div className="result-panel">
       <h2 className="result-panel__title">Hasil Analisis Pemohon</h2>
+
+      {identity && (
+        <div className="result-panel__identity">
+          <div className="identity-card">
+            <span className="identity-card__label">Nama</span>
+            <span className="identity-card__value">{identity.applicant_name}</span>
+          </div>
+          <div className="identity-card">
+            <span className="identity-card__label">Umur</span>
+            <span className="identity-card__value">{identity.applicant_age} tahun</span>
+          </div>
+          <div className="identity-card">
+            <span className="identity-card__label">Jenis Kelamin</span>
+            <span className="identity-card__value">{identity.applicant_gender}</span>
+          </div>
+        </div>
+      )}
 
       <div className="result-panel__grid">
         <div className={`result-card ${riskColor(result.predicted_risk_category)}`}>
@@ -74,6 +96,12 @@ export default function ResultPanel({ result, reasonSummary }) {
       <div className="result-panel__disclaimer">
         <strong>Disclaimer:</strong> Hasil ini adalah rekomendasi pendukung keputusan analis kredit,
         bukan persetujuan pinjaman otomatis. Validasi bisnis akhir tetap harus dilakukan oleh analis kredit.
+      </div>
+
+      <div className="result-panel__actions">
+        <button type="button" className="btn btn--export" onClick={handleExport}>
+          Ekspor ke PDF
+        </button>
       </div>
     </div>
   );

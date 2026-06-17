@@ -26,6 +26,11 @@ export const YES_NO_OPTIONS = [
   { label: "Tidak", value: 0 },
 ];
 
+export const GENDER_OPTIONS = [
+  { label: "Laki-laki", value: "Laki-laki" },
+  { label: "Perempuan", value: "Perempuan" },
+];
+
 export const RISK_LABELS = {
   0: "Low Risk",
   1: "Medium Risk",
@@ -39,10 +44,10 @@ export const RISK_LABEL_ID = {
 };
 
 export const ELIGIBILITY_STATUS = [
-  { min: 0.80, label: "Sangat Layak" },
-  { min: 0.60, label: "Layak" },
-  { min: 0.40, label: "Dipertimbangkan" },
-  { min: 0.20, label: "Berisiko" },
+  { min: 0.5054, label: "Sangat Layak" },
+  { min: 0.4602, label: "Layak" },
+  { min: 0.4176, label: "Dipertimbangkan" },
+  { min: 0.3319, label: "Berisiko" },
   { min: 0, label: "Tidak Layak" },
 ];
 

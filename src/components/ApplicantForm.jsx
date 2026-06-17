@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FieldGroup from "./FieldGroup";
 import {
   INCOME_STABILITY_OPTIONS,
   EMPLOYER_CATEGORY_OPTIONS,
   CREDIT_EXPOSURE_OPTIONS,
   YES_NO_OPTIONS,
+  GENDER_OPTIONS,
 } from "../ml/mappings";
 
 const INITIAL = {
+  applicant_name: "",
+  applicant_age: "",
+  applicant_gender: "",
   income_stability: "",
   average_eligible_emi: "",
   average_usable_salary: "",
@@ -59,19 +63,34 @@ export default function ApplicantForm({ onSubmit, onReset }) {
     });
   }
 
+  useEffect(() => {
+    const gaji = Number(data.average_usable_salary);
+    const cicilan = Number(data.average_eligible_emi);
+    if (gaji > 0 && cicilan >= 0 && data.average_usable_salary !== "" && data.average_eligible_emi !== "") {
+      const rasio = ((cicilan / gaji) * 100).toFixed(2);
+      setData((prev) => ({ ...prev, average_obligation_to_income_ratio: rasio }));
+    }
+  }, [data.average_usable_salary, data.average_eligible_emi]);
+
   function handleSubmit(e) {
     e.preventDefault();
+    const identity = {
+      applicant_name: data.applicant_name.trim(),
+      applicant_age: data.applicant_age === "" ? "" : Number(data.applicant_age),
+      applicant_gender: data.applicant_gender,
+    };
     const parsed = {};
     for (const [key, val] of Object.entries(data)) {
+      if (key.startsWith("applicant_")) continue;
       if (key === "income_stability" || key === "employer_category") {
         parsed[key] = val;
-      } else if (key === "has_credit_card" || key === "has_personal_loan" || key === "has_home_loan" || key === "credit_exposure_intensity") {
-        parsed[key] = val === "" ? "" : Number(val);
+      } else if (currencyFields.has(key)) {
+        parsed[key] = val === "" ? "" : Number(val) / 100;
       } else {
         parsed[key] = val === "" ? "" : Number(val);
       }
     }
-    onSubmit(parsed, setErrors);
+    onSubmit(parsed, identity, setErrors);
   }
 
   function handleReset() {
@@ -134,15 +153,30 @@ export default function ApplicantForm({ onSubmit, onReset }) {
 
   return (
     <form className="applicant-form" onSubmit={handleSubmit} noValidate>
+      <FieldGroup title="Identitas Pemohon">
+        {renderInput("applicant_name", "Nama lengkap", "text", {
+          placeholder: "Contoh: Budi Santoso",
+          hint: "Nama lengkap sesuai KTP",
+        })}
+        {renderInput("applicant_age", "Umur (tahun)", "text", {
+          placeholder: "30",
+          hint: "Umur saat ini, minimal 17 tahun",
+        })}
+        {renderInput("applicant_gender", "Jenis kelamin", "text", {
+          type: "dropdown",
+          options: GENDER_OPTIONS,
+        })}
+      </FieldGroup>
+
       <FieldGroup title="Data Pekerjaan dan Pendapatan">
         {renderInput("income_stability", "Stabilitas pendapatan", "text", {
           type: "dropdown",
           options: INCOME_STABILITY_OPTIONS,
           hint: "Apakah penghasilan pemohon stabil tiap bulan, naik-turun, atau tidak menentu",
         })}
-        {renderInput("average_eligible_emi", "Sisa kemampuan bayar cicilan per bulan", "text", {
-          placeholder: "2.000.000",
-          hint: "Dana tersisa per bulan setelah dikurangi kebutuhan hidup",
+        {renderInput("average_eligible_emi", "Mampu bayar cicilan berapa per bulan", "text", {
+          placeholder: "3.000.000",
+          hint: "Besar cicilan maksimal yang sanggup dibayar setiap bulan",
         })}
         {renderInput("average_usable_salary", "Rata-rata gaji bersih per bulan", "text", {
           placeholder: "8.000.000",
@@ -164,17 +198,17 @@ export default function ApplicantForm({ onSubmit, onReset }) {
       </FieldGroup>
 
       <FieldGroup title="Kondisi Rekening">
-        {renderInput("average_month_end_balance", "Rata-rata saldo akhir bulan", "text", {
+        {renderInput("average_month_end_balance", "Rata-rata saldo di akhir bulan (3-6 bulan terakhir)", "text", {
           placeholder: "1.500.000",
-          hint: "Rata-rata saldo di akhir bulan selama beberapa bulan terakhir",
+          hint: "Cek mutasi rekening: catat saldo di akhir tiap bulan, lalu rata-ratakan",
         })}
-        {renderInput("bounce_count", "Jumlah transaksi gagal/autodebet gagal", "text", {
+        {renderInput("bounce_count", "Berapa kali transaksi ditolak karena saldo tidak cukup", "text", {
           placeholder: "0",
-          hint: "Transaksi ditolak karena saldo tidak cukup",
+          hint: "Misalnya autodebet gagal, transfer ditolak, atau pembayaran otomatis gagal",
         })}
-        {renderInput("gambling_transaction_count", "Jumlah transaksi berisiko seperti gambling", "text", {
+        {renderInput("gambling_transaction_count", "Berapa kali transaksi ke judi online atau spekulasi", "text", {
           placeholder: "0",
-          hint: "Transaksi ke situs judi, taruhan, atau aktivitas spekulatif",
+          hint: "Termasuk judi online, taruhan bola, slot, atau aktivitas spekulatif lainnya",
         })}
       </FieldGroup>
 
@@ -205,7 +239,7 @@ export default function ApplicantForm({ onSubmit, onReset }) {
         {renderInput("average_obligation_to_income_ratio", "Rasio cicilan terhadap pendapatan", "text", {
           type: "percent",
           placeholder: "35",
-          hint: "Total cicilan bulanan dibagi gaji bulanan, dikali 100",
+          hint: "Otomatis dihitung dari kemampuan bayar cicilan dibagi gaji, bisa diubah manual",
         })}
         {renderInput("credit_score", "Skor kredit", "text", {
           placeholder: "681",
