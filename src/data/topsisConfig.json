@@ -1,0 +1,38 @@
+{
+  "criteria": [
+    "credit_score",
+    "average_usable_salary",
+    "average_eligible_emi",
+    "employment_tenure_years",
+    "average_month_end_balance",
+    "average_obligation_to_income_ratio",
+    "active_loans_count",
+    "credit_exposure_intensity",
+    "bounce_count",
+    "high_risk_probability"
+  ],
+  "types": [
+    "benefit",
+    "benefit",
+    "benefit",
+    "benefit",
+    "benefit",
+    "cost",
+    "cost",
+    "cost",
+    "cost",
+    "cost"
+  ],
+  "weights": [
+    0.18181818181818182,
+    0.13636363636363635,
+    0.09090909090909091,
+    0.09090909090909091,
+    0.09090909090909091,
+    0.13636363636363635,
+    0.045454545454545456,
+    0.045454545454545456,
+    0.045454545454545456,
+    0.13636363636363635
+  ]
+}
