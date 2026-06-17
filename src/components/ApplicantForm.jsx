@@ -39,7 +39,7 @@ function parseCurrency(str) {
   return str.replace(/\D/g, "");
 }
 
-export default function ApplicantForm({ onSubmit, onReset }) {
+export default function ApplicantForm({ onSubmit, onReset, disabled, analyzing }) {
   const [data, setData] = useState({ ...INITIAL });
   const [errors, setErrors] = useState({});
 
@@ -116,6 +116,7 @@ export default function ApplicantForm({ onSubmit, onReset }) {
             className="form-field__input"
             value={data[field]}
             onChange={(e) => handleChange(field, e.target.value)}
+            disabled={disabled}
           >
             <option value="">-- Pilih --</option>
             {opts.options.map((opt) => (
@@ -141,6 +142,7 @@ export default function ApplicantForm({ onSubmit, onReset }) {
               }
               onChange={(e) => handleChange(field, e.target.value)}
               placeholder={opts?.placeholder || ""}
+              disabled={disabled}
             />
             {isPercent && <span className="form-field__suffix">%</span>}
           </div>
@@ -248,10 +250,10 @@ export default function ApplicantForm({ onSubmit, onReset }) {
       </FieldGroup>
 
       <div className="applicant-form__actions">
-        <button type="submit" className="btn btn--primary">
-          Analisis Pemohon
+        <button type="submit" className="btn btn--primary" disabled={disabled}>
+          {analyzing ? "Menganalisis..." : "Analisis Pemohon"}
         </button>
-        <button type="button" className="btn btn--secondary" onClick={handleReset}>
+        <button type="button" className="btn btn--secondary" onClick={handleReset} disabled={analyzing}>
           Reset
         </button>
       </div>

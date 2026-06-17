@@ -19,11 +19,11 @@ function riskColor(risk) {
   return "risk--high";
 }
 
-export default function ResultPanel({ result, reasonSummary, identity, formData }) {
+export default function ResultPanel({ result, reasonSummary, analysisNarrative, identity, formData }) {
   if (!result) return null;
 
   function handleExport() {
-    exportToPdf(identity, formData, result, reasonSummary);
+    exportToPdf(identity, formData, result, reasonSummary, analysisNarrative);
   }
 
   return (
@@ -70,6 +70,11 @@ export default function ResultPanel({ result, reasonSummary, identity, formData 
           <span className="result-card__value">{pct(result.high_risk_probability)}</span>
         </div>
 
+        <div className={`result-card confidence--${result.confidence_level}`}>
+          <span className="result-card__label">Kepercayaan Prediksi MLP</span>
+          <span className="result-card__value">{result.confidence_label}</span>
+        </div>
+
         <div className={`result-card ${scoreColor(result.topsis_score)}`}>
           <span className="result-card__label">Skor Kelayakan TOPSIS</span>
           <span className="result-card__value">{result.topsis_score.toFixed(4)}</span>
@@ -88,9 +93,9 @@ export default function ResultPanel({ result, reasonSummary, identity, formData 
         </div>
       </div>
 
-      <div className="result-panel__reasons">
-        <h3 className="result-panel__subtitle">Ringkasan Faktor</h3>
-        <p className="result-panel__reason-text">{reasonSummary}</p>
+      <div className="result-panel__narrative">
+        <h3 className="result-panel__subtitle">Narasi Analisis</h3>
+        <p className="result-panel__narrative-text">{analysisNarrative}</p>
       </div>
 
       <div className="result-panel__disclaimer">

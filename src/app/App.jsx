@@ -1,18 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ApplicantForm from "../components/ApplicantForm";
 import ResultPanel from "../components/ResultPanel";
 import { validateApplicant, validateIdentity } from "../ml/validation";
 import { predictApplicant } from "../ml/predictApplicant";
-import { buildReasonSummary } from "../ml/reasonSummary";
+import { buildReasonSummary, buildAnalysisNarrative } from "../ml/reasonSummary";
+import { loadModel } from "../ml/mlpTfjs";
 import "../styles/app.css";
 
 function App() {
+  const [modelReady, setModelReady] = useState(false);
   const [result, setResult] = useState(null);
   const [reasonSummary, setReasonSummary] = useState("");
+  const [analysisNarrative, setAnalysisNarrative] = useState("");
   const [identity, setIdentity] = useState(null);
   const [rawFormData, setRawFormData] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
 
-  function handleSubmit(formData, identityData, setErrors) {
+  useEffect(() => {
+    loadModel()
+      .then(() => setModelReady(true))
+      .catch((err) => console.error("Gagal memuat model:", err));
+  }, []);
+
+  async function handleSubmit(formData, identityData, setErrors) {
     const idValidation = validateIdentity(identityData);
     const mlValidation = validateApplicant(formData);
 
@@ -21,21 +31,32 @@ function App() {
       setErrors(allErrors);
       setResult(null);
       setReasonSummary("");
+      setAnalysisNarrative("");
       return;
     }
 
-    const prediction = predictApplicant(formData);
-    const summary = buildReasonSummary(formData);
+    setAnalyzing(true);
+    try {
+      const prediction = await predictApplicant(formData);
+      const summary = buildReasonSummary(formData);
+      const narrative = buildAnalysisNarrative(prediction, summary);
 
-    setIdentity(identityData);
-    setRawFormData(formData);
-    setResult(prediction);
-    setReasonSummary(summary);
+      setIdentity(identityData);
+      setRawFormData(formData);
+      setResult(prediction);
+      setReasonSummary(summary);
+      setAnalysisNarrative(narrative);
+    } catch (err) {
+      console.error("Gagal menganalisis:", err);
+    } finally {
+      setAnalyzing(false);
+    }
   }
 
   function handleReset() {
     setResult(null);
     setReasonSummary("");
+    setAnalysisNarrative("");
     setIdentity(null);
     setRawFormData(null);
   }
@@ -50,9 +71,20 @@ function App() {
         </p>
       </header>
 
+      {!modelReady && (
+        <div className="model-loading">
+          Memuat model machine learning...
+        </div>
+      )}
+
       <main className="app-main">
-        <ApplicantForm onSubmit={handleSubmit} onReset={handleReset} />
-        <ResultPanel result={result} reasonSummary={reasonSummary} identity={identity} formData={rawFormData} />
+        <ApplicantForm
+          onSubmit={handleSubmit}
+          onReset={handleReset}
+          disabled={!modelReady || analyzing}
+          analyzing={analyzing}
+        />
+        <ResultPanel result={result} reasonSummary={reasonSummary} analysisNarrative={analysisNarrative} identity={identity} formData={rawFormData} />
       </main>
 
       <footer className="app-footer">

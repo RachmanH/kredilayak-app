@@ -122,7 +122,26 @@ function drawRow(doc, label, value, y, stripe) {
   return y + 7;
 }
 
-export function exportToPdf(identity, formData, result, reasonSummary) {
+function drawNarrative(doc, y, narrative) {
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(26, 26, 26);
+  const lines = doc.splitTextToSize(narrative, 174);
+  const blockHeight = lines.length * 5 + 8;
+  if (y + blockHeight > 270) {
+    doc.addPage();
+    y = 20;
+  }
+  doc.setFillColor(255, 248, 243);
+  doc.rect(15, y - 4, 180, blockHeight, "F");
+  doc.setDrawColor(255, 107, 53);
+  doc.setLineWidth(0.3);
+  doc.line(15, y - 4, 15, y - 4 + blockHeight);
+  doc.text(lines, 18, y);
+  return y + blockHeight;
+}
+
+export function exportToPdf(identity, formData, result, reasonSummary, analysisNarrative) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = 210;
 
@@ -173,6 +192,7 @@ export function exportToPdf(identity, formData, result, reasonSummary) {
   y = drawRow(doc, "Probabilitas Risiko Rendah", (result.low_risk_probability * 100).toFixed(1) + "%", y, true);
   y = drawRow(doc, "Probabilitas Risiko Sedang", (result.medium_risk_probability * 100).toFixed(1) + "%", y, false);
   y = drawRow(doc, "Probabilitas Risiko Tinggi", (result.high_risk_probability * 100).toFixed(1) + "%", y, true);
+  y = drawRow(doc, "Kepercayaan Prediksi MLP", result.confidence_label, y, false);
   y += 4;
 
   y = drawSectionTitle(doc, "Skor Kelayakan TOPSIS", y);
@@ -192,6 +212,12 @@ export function exportToPdf(identity, formData, result, reasonSummary) {
   }
   doc.text(reasonLines, 18, y);
   y += reasonLines.length * 5 + 6;
+
+  if (analysisNarrative) {
+    y = drawSectionTitle(doc, "Narasi Analisis", y);
+    y = drawNarrative(doc, y, analysisNarrative);
+    y += 4;
+  }
 
   if (y > 255) {
     doc.addPage();
