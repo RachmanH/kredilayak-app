@@ -12,8 +12,7 @@ android/
 *.pkl
 *.keras
 
-# TF.js converted model (regenerate via: PYENV_VERSION=envpython11 python scripts/convertToTfjs.py)
-public/tfjs_model/
+# SavedModel export (regenerate via: PYENV_VERSION=envpython11 python scripts/convertToTfjs.py)
 public/saved_model/
 
 # Large data files (exported JSON versions are in src/data/)
@@ -21,6 +20,11 @@ public/saved_model/
 
 # Jupyter notebook (logic documented in PRD and mapping_plan.md)
 *.ipynb
+
+# Documents
+*.md
+!README.md
+*.pdf
 
 # APK binaries
 *.apk

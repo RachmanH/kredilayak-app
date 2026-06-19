@@ -84,6 +84,13 @@ body {
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+.model-loading--error {
+  color: #991b1b;
+  background: #fef2f2;
+  border-color: #dc2626;
+  animation: none;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }

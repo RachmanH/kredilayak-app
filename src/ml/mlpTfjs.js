@@ -6,10 +6,16 @@ let loading = null;
 export async function loadModel() {
   if (model) return model;
   if (loading) return loading;
-  loading = tf.loadLayersModel("/tfjs_model/model.json").then((m) => {
-    model = m;
-    return m;
-  });
+  const modelUrl = `${import.meta.env.BASE_URL}tfjs_model/model.json`;
+  loading = tf.loadLayersModel(modelUrl)
+    .then((m) => {
+      model = m;
+      return m;
+    })
+    .catch((err) => {
+      loading = null;
+      throw err;
+    });
   return loading;
 }
 

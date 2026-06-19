@@ -15,11 +15,15 @@ function App() {
   const [identity, setIdentity] = useState(null);
   const [rawFormData, setRawFormData] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [modelError, setModelError] = useState(false);
 
   useEffect(() => {
     loadModel()
       .then(() => setModelReady(true))
-      .catch((err) => console.error("Gagal memuat model:", err));
+      .catch((err) => {
+        console.error("Gagal memuat model:", err);
+        setModelError(true);
+      });
   }, []);
 
   async function handleSubmit(formData, identityData, setErrors) {
@@ -71,9 +75,15 @@ function App() {
         </p>
       </header>
 
-      {!modelReady && (
+      {!modelReady && !modelError && (
         <div className="model-loading">
           Memuat model machine learning...
+        </div>
+      )}
+
+      {modelError && (
+        <div className="model-loading model-loading--error">
+          Gagal memuat model machine learning. Pastikan file model tersedia di /tfjs_model/model.json.
         </div>
       )}
 
