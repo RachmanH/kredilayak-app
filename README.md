@@ -6,6 +6,11 @@ Sistem Pendukung Keputusan (SPK) kelayakan pinjaman berbasis prediksi risiko kre
 ![React](https://img.shields.io/badge/react-19-61dafb)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## Kaggle
+
+- Dataset : https://www.kaggle.com/datasets/hrishitpatil/financial-credibility-and-loan-decision-dataset
+- Notebook : https://www.kaggle.com/code/rachman098/hybrid-mlp-topsis-for-loan-eligibility
+
 ## Fitur
 
 - Input data pemohon dengan label bahasa bisnis yang mudah dipahami analis
